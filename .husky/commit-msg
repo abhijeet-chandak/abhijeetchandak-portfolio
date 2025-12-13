@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Check commit message format (optional - can be customized)
+# This is a basic example - you can add more sophisticated checks
+
+commit_msg=$(cat "$1")
+
+# Check for common issues
+if echo "$commit_msg" | grep -qiE "(fix|feat|chore|docs|style|refactor|test|perf|ci|build|revert)(\(.+\))?:"; then
+  echo "✅ Commit message follows conventional format"
+else
+  echo "⚠️  Consider using conventional commit format: type(scope): description"
+  echo "   Examples: feat: add new feature, fix: resolve bug, docs: update readme"
+fi

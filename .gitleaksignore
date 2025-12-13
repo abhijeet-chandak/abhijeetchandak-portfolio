@@ -1,0 +1,56 @@
+# Gitleaks ignore patterns
+# This file contains patterns that gitleaks should ignore when scanning for secrets
+
+# Allow common test/example patterns
+allowlist:
+  # Common test patterns
+  description: "Allow test files with example secrets"
+  paths:
+    - "**/*test*.{js,ts,jsx,tsx}"
+    - "**/*spec*.{js,ts,jsx,tsx}"
+    - "**/__tests__/**"
+    - "**/tests/**"
+    - "**/test/**"
+    - "**/*.test.{js,ts,jsx,tsx}"
+    - "**/*.spec.{js,ts,jsx,tsx}"
+
+  # Documentation files
+  - "**/*.md"
+  - "**/README*"
+  - "**/CHANGELOG*"
+  - "**/docs/**"
+
+  # Configuration examples
+  - "**/*.example.*"
+  - "**/*.sample.*"
+  - "**/*example*"
+  - "**/*sample*"
+
+  # Build and output directories
+  - "**/out/**"
+  - "**/.next/**"
+  - "**/dist/**"
+  - "**/build/**"
+
+  # Lock files (may contain hashes that look like secrets)
+  - "**/package-lock.json"
+  - "**/yarn.lock"
+  - "**/pnpm-lock.yaml"
+
+  # Public assets
+  - "**/public/**"
+
+  # Allow specific patterns that might look like secrets but are safe
+  regexes:
+    # Example API keys in documentation
+    - "api[_-]?key[=:]?['\"]?example['\"]?"
+    - "api[_-]?key[=:]?['\"]?test['\"]?"
+    - "api[_-]?key[=:]?['\"]?demo['\"]?"
+
+    # Example tokens
+    - "token[=:]?['\"]?example['\"]?"
+    - "token[=:]?['\"]?test['\"]?"
+
+    # Example secrets
+    - "secret[=:]?['\"]?example['\"]?"
+    - "secret[=:]?['\"]?test['\"]?"

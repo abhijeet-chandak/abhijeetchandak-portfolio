@@ -1,0 +1,62 @@
+# Gitleaks configuration for secret scanning
+# See: https://github.com/gitleaks/gitleaks
+
+title = "gitleaks config"
+
+[extend]
+# Use default gitleaks rules
+useDefault = true
+
+[allowlist]
+description = "Allowlist for portfolio project"
+paths = [
+  # Test files
+  '''.*test.*\.(js|ts|jsx|tsx|json)$''',
+  '''.*spec.*\.(js|ts|jsx|tsx|json)$''',
+  '''.*/__tests__/.*''',
+  '''.*/tests/.*''',
+  '''.*/test/.*''',
+
+  # Documentation
+  '''.*\.md$''',
+  '''.*README.*''',
+  '''.*CHANGELOG.*''',
+  '''.*/docs/.*''',
+
+  # Examples
+  '''.*\.example\..*''',
+  '''.*\.sample\..*''',
+  '''.*example.*''',
+  '''.*sample.*''',
+
+  # Build outputs
+  '''.*/out/.*''',
+  '''.*/\.next/.*''',
+  '''.*/dist/.*''',
+  '''.*/build/.*''',
+
+  # Lock files
+  '''.*package-lock\.json$''',
+  '''.*yarn\.lock$''',
+  '''.*pnpm-lock\.yaml$''',
+
+  # Public assets
+  '''.*/public/.*''',
+]
+
+regexes = [
+  # Allow example/test patterns
+  '''api[_-]?key[=:]?['"]?example['"]?''',
+  '''api[_-]?key[=:]?['"]?test['"]?''',
+  '''api[_-]?key[=:]?['"]?demo['"]?''',
+  '''token[=:]?['"]?example['"]?''',
+  '''token[=:]?['"]?test['"]?''',
+  '''secret[=:]?['"]?example['"]?''',
+  '''secret[=:]?['"]?test['"]?''',
+]
+
+commits = [
+  # Allow commits with "test" or "example" in message
+  '''.*test.*''',
+  '''.*example.*''',
+]
