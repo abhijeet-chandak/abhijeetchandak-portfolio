@@ -20,7 +20,7 @@ const Experience = () => {
     },
     {
       title: "Associate Software Engineer Intern",
-      company: "Mindbody",
+      company: "Mindbody Software Pvt Ltd",
       location: "Pune",
       period: "Jan 2023 - Jun 2023",
       description: [

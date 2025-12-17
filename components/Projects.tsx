@@ -26,6 +26,42 @@ const Projects = () => {
       github: "https://github.com/abhijeet-chandak/docnify-pdf",
       demo: "#projects",
     },
+    {
+      title: "ApplyTracker",
+      description:
+        "A privacy-first Chrome extension that helps users track job applications directly from job listing pages. ApplyTracker automatically detects job pages (LinkedIn, Indeed, Greenhouse, Lever, Workday), captures key details, tracks application status (Applied, Interview, Offer, Rejected), sets follow-up reminders with browser notifications, and provides search, filter, and export capabilities (CSV/JSON). Fully local storage with zero tracking — no accounts, servers, or paid APIs.",
+      technologies: [
+        "JavaScript",
+        "Chrome Extension",
+        "Manifest V3",
+        "HTML",
+        "CSS",
+        "Chrome Storage API",
+        "Chrome Alarms API",
+        "Chrome Notifications API",
+      ],
+      image: "🧩",
+      github: "#projects",
+      demo: "#projects",
+    },
+    {
+      title: "MeetNotes",
+      description:
+        "A lightweight, privacy-first Chrome extension that enables users to take meeting notes, track action items, and set follow-up reminders directly inside online meetings. MeetNotes automatically activates on Google Meet, Zoom (Web), and Microsoft Teams, providing a distraction-free floating notes panel with agenda planning, timestamps, and export options. 100% local storage — no servers, no analytics, no login required.",
+      technologies: [
+        "JavaScript",
+        "Chrome Extension",
+        "Manifest V3",
+        "HTML",
+        "CSS",
+        "Chrome Storage API",
+        "Chrome Alarms API",
+        "Chrome Notifications API",
+      ],
+      image: "📝",
+      github: "#projects",
+      demo: "#projects",
+    },
   ];
 
   return (
@@ -42,7 +78,7 @@ const Projects = () => {
           className="text-center mb-8 md:mb-12 lg:mb-16"
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-4 md:mb-6 gradient-text px-4">
-            Projects
+            Featured Projects
           </h2>
           <div className="w-24 md:w-32 h-1 md:h-1.5 bg-slate-900 dark:bg-slate-300 mx-auto mb-4 md:mb-6 rounded-full"></div>
           <p className="text-slate-700 dark:text-slate-100 text-base md:text-lg max-w-2xl mx-auto px-4">
