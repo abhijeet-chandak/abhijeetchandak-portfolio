@@ -131,11 +131,6 @@ const nextConfig = {
 
   // Optimize static generation
   distDir: ".next",
-
-  // Environment variables
-  env: {
-    CUSTOM_KEY: process.env.CUSTOM_KEY,
-  },
 };
 
 module.exports = nextConfig;

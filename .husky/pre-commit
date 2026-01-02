@@ -1,20 +1,17 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+# Run quality checks (fast checks only - comprehensive checks run in CI/CD)
+set -e
+
+echo "🔍 Running pre-commit checks..."
+
 # Run linting
+echo "  Running ESLint..."
 npm run lint
 
 # Run type checking
+echo "  Running TypeScript type check..."
 npm run type-check
 
-# Run gitleaks if installed
-if command -v gitleaks &> /dev/null; then
-  echo "Running gitleaks security scan..."
-  gitleaks detect --source . --verbose --no-banner
-  if [ $? -ne 0 ]; then
-    echo "❌ Gitleaks found potential secrets. Please review and fix before committing."
-    exit 1
-  fi
-else
-  echo "⚠️  Gitleaks not installed. Install from: https://github.com/gitleaks/gitleaks/releases"
-fi
+echo "✅ Pre-commit checks passed!"

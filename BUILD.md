@@ -36,7 +36,7 @@ The project includes:
 - **Minification**: SWC minifier for JavaScript and CSS
 - **Tree Shaking**: Unused code elimination
 - **Console Removal**: `console.log()` removed in production
-- **Post-Build Optimization**: Automatic HTML optimization
+- **Optimized Bundling**: Webpack optimizations for production builds
 
 ## Output Folder
 
@@ -69,6 +69,7 @@ The `out/` folder can be deployed to any static hosting service:
 
 ### Large Build Size
 
-1. Run `npm run build` and check the post-build analysis
+1. Run `npm run build` and review the build output
 2. Optimize images in the `public/` folder
 3. Remove unused dependencies
+4. Use Next.js Image component for automatic optimization

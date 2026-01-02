@@ -133,12 +133,8 @@ const Navbar = () => {
                 className="px-4 py-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-full font-semibold text-sm shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                 aria-label="Download resume PDF"
               >
-                <Download
-                  className={`w-4 h-4 ${isDownloading ? "animate-pulse" : ""}`}
-                />
-                <span className="hidden lg:inline">
-                  {isDownloading ? "Loading..." : "Resume"}
-                </span>
+                <Download className={`w-4 h-4 ${isDownloading ? "animate-pulse" : ""}`} />
+                <span className="hidden lg:inline">{isDownloading ? "Loading..." : "Resume"}</span>
                 <span className="lg:hidden">CV</span>
               </motion.button>
             </div>

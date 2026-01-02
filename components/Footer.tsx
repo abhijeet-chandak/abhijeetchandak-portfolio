@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Github, Linkedin, Mail, ArrowUp, Heart, Twitter } from "lucide-react";
+import { Github, Linkedin, Mail, ArrowUp, Twitter } from "lucide-react";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -53,11 +53,10 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 mb-12">
           {/* Brand Column */}
           <div className="space-y-4">
-            <h3 className="text-xl font-display font-bold gradient-text">
-              Abhijeet Chandak
-            </h3>
+            <h3 className="text-xl font-display font-bold gradient-text">Abhijeet Chandak</h3>
             <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed max-w-xs">
-              Building scalable and performant web applications with a focus on user experience and clean code.
+              Building scalable and performant web applications with a focus on user experience and
+              clean code.
             </p>
           </div>
 
@@ -80,9 +79,12 @@ const Footer = () => {
 
           {/* Contact & Socials */}
           <div className="lg:col-span-2">
-            <h4 className="font-semibold text-slate-900 dark:text-white mb-4">Let&apos;s Connect</h4>
+            <h4 className="font-semibold text-slate-900 dark:text-white mb-4">
+              Let&apos;s Connect
+            </h4>
             <p className="text-slate-600 dark:text-slate-400 text-sm mb-6 max-w-sm">
-              Open for opportunities. Whether you have a question or just want to say hi, I&apos;ll try my best to get back to you!
+              Open for opportunities. Whether you have a question or just want to say hi, I&apos;ll
+              try my best to get back to you!
             </p>
             <div className="flex flex-wrap gap-4">
               {socialLinks.map((social) => (

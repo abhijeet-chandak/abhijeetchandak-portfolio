@@ -6,7 +6,6 @@
     "dev": "next dev",
     "build": "next build",
     "build:analyze": "ANALYZE=true next build",
-    "build:production": "NODE_ENV=production next build",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
@@ -17,14 +16,9 @@
     "security:check": "npm audit --audit-level=critical",
     "security:check:strict": "npm audit --audit-level=moderate",
     "security:fix": "npm audit fix",
-    "gitleaks": "gitleaks detect --source . --verbose",
-    "gitleaks:install": "echo 'Install gitleaks from https://github.com/gitleaks/gitleaks/releases'",
-    "pre-commit": "npm run lint && npm run type-check",
-    "export": "next build",
     "clean": "rm -rf .next out",
     "clean:win": "if exist .next (rmdir /s /q .next) && if exist out (rmdir /s /q out)",
-    "postbuild": "node scripts/postbuild.js",
-    "validate": "npm run lint && npm run type-check && npm run build",
+    "validate": "npm run lint && npm run type-check && npm run format:check && npm run build",
     "prepare": "husky"
   },
   "dependencies": {

@@ -1,25 +1,31 @@
 name: CI/CD
 
-# Trigger on push to main/master and on pull requests
 on:
   push:
     branches: [main, master]
   pull_request:
     branches: [main, master]
-  workflow_dispatch: # Allow manual trigger from GitHub UI
+  workflow_dispatch:
+
+# Cancel in-progress runs for the same workflow and branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
-  NODE_VERSION: "20"
+  NODE_VERSION: "20.x"
 
 jobs:
-  # Quality Assurance - Runs on every push and PR
   quality:
     name: Quality Checks
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for better caching
 
       - name: 🔧 Setup Node.js
         uses: actions/setup-node@v4
@@ -27,8 +33,18 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
 
+      - name: 📦 Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
       - name: 📦 Install dependencies
-        run: npm ci
+        run: npm ci --prefer-offline --no-audit
 
       - name: 🔍 Run ESLint
         run: npm run lint
@@ -43,19 +59,20 @@ jobs:
         run: npm run security:check
         continue-on-error: true
 
-      - name: 🛡️ Scan for secrets (Gitleaks)
+      - name: 🛡️ Scan for secrets
         uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           config-path: .gitleaks.toml
+          no-git: false
+          verbose: true
+          redact: true
         continue-on-error: true
 
-  # Build - Only runs if quality checks pass
   build:
     name: Build Project
     runs-on: ubuntu-latest
     needs: quality
+    timeout-minutes: 15
 
     steps:
       - name: 📥 Checkout code
@@ -67,21 +84,52 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
 
+      - name: 📦 Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: 📦 Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: |
+            .next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+
       - name: 📦 Install dependencies
-        run: npm ci
+        run: npm ci --prefer-offline --no-audit
 
       - name: 🏗️ Build project
         run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+
+      - name: 📊 Build size analysis
+        run: |
+          if [ -d "out" ]; then
+            echo "### 📦 Build Size" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            du -sh out/ >> $GITHUB_STEP_SUMMARY
+            find out/ -type f | wc -l | xargs echo "Total files:" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: 📤 Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: production-build
+          name: production-build-${{ github.sha }}
           path: out/
-          retention-days: 30
+          retention-days: 7
           compression-level: 9
+          if-no-files-found: error
 
-  # Deploy to Vercel - Only runs on main/master branch after successful build
   deploy:
     name: Deploy to Vercel
     runs-on: ubuntu-latest
@@ -98,10 +146,10 @@ jobs:
       - name: 📥 Download build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: production-build
+          name: production-build-${{ github.sha }}
           path: out/
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      # Vercel Deployment (optional - Vercel Dashboard integration is recommended)
       - name: 🚀 Deploy to Vercel
         id: deploy
         uses: amondnet/vercel-action@v25
@@ -110,37 +158,76 @@ jobs:
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           vercel-args: "--prod"
+          working-directory: ./
         continue-on-error: true
 
-  # Summary - Always runs to show deployment status
   summary:
-    name: Deployment Summary
+    name: Pipeline Summary
     runs-on: ubuntu-latest
     needs: [quality, build, deploy]
     if: always()
+    timeout-minutes: 2
 
     steps:
       - name: 📊 Create summary
         run: |
           echo "## 🚀 CI/CD Pipeline Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### ✅ Quality Checks" >> $GITHUB_STEP_SUMMARY
-          echo "- ESLint: ✅" >> $GITHUB_STEP_SUMMARY
-          echo "- TypeScript: ✅" >> $GITHUB_STEP_SUMMARY
-          echo "- Formatting: ✅" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 🏗️ Build" >> $GITHUB_STEP_SUMMARY
-          echo "- Status: ✅ Completed" >> $GITHUB_STEP_SUMMARY
-          echo "- Artifacts: Uploaded" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 🚀 Deployment" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ github.ref }}" == "refs/heads/main" ] || [ "${{ github.ref }}" == "refs/heads/master" ]; then
-            echo "- Status: ✅ Deployed to Vercel" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ needs.quality.result }}" == "success" ]; then
+            echo "| Quality Checks | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ needs.quality.result }}" == "failure" ]; then
+            echo "| Quality Checks | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
           else
-            echo "- Status: ⏭️ Skipped (not main branch)" >> $GITHUB_STEP_SUMMARY
+            echo "| Quality Checks | ⏭️ Skipped |" >> $GITHUB_STEP_SUMMARY
           fi
+
+          if [ "${{ needs.build.result }}" == "success" ]; then
+            echo "| Build | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ needs.build.result }}" == "failure" ]; then
+            echo "| Build | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Build | ⏭️ Skipped |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "${{ github.ref }}" == "refs/heads/main" ] || [ "${{ github.ref }}" == "refs/heads/master" ]; then
+            if [ "${{ needs.deploy.result }}" == "success" ]; then
+              echo "| Deployment | ✅ Deployed |" >> $GITHUB_STEP_SUMMARY
+            elif [ "${{ needs.deploy.result }}" == "failure" ]; then
+              echo "| Deployment | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+            elif [ "${{ needs.deploy.result }}" == "skipped" ]; then
+              echo "| Deployment | ⏭️ Skipped (Build failed) |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| Deployment | ⚠️ Cancelled |" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "| Deployment | ⏭️ Skipped (Not main branch) |" >> $GITHUB_STEP_SUMMARY
+          fi
+
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "**Branch:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "**Author:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Workflow:** ${{ github.workflow }}" >> $GITHUB_STEP_SUMMARY
+          echo "### 📋 Details" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Author:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Workflow:** ${{ github.workflow }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Event:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+
+          # Determine overall status
+          if [ "${{ needs.quality.result }}" == "failure" ] || [ "${{ needs.build.result }}" == "failure" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "❌ **Pipeline failed**" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          elif [ "${{ github.ref }}" == "refs/heads/main" ] || [ "${{ github.ref }}" == "refs/heads/master" ]; then
+            if [ "${{ needs.deploy.result }}" == "failure" ]; then
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "⚠️ **Pipeline completed with deployment failure**" >> $GITHUB_STEP_SUMMARY
+            elif [ "${{ needs.deploy.result }}" == "success" ]; then
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "✅ **Pipeline succeeded**" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **Pipeline succeeded**" >> $GITHUB_STEP_SUMMARY
+          fi
