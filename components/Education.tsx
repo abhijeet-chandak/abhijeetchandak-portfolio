@@ -34,9 +34,14 @@ const Education = () => {
           transition={{ duration: 0.5 }}
           className="text-center mb-8 md:mb-12 lg:mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-4 md:mb-6 gradient-text px-4">
-            Academic Journey
-          </h2>
+          <div className="flex items-center justify-center gap-3 mb-4 md:mb-6">
+            <span className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
+              <GraduationCap className="w-6 h-6 md:w-8 md:h-8" />
+            </span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold gradient-text">
+              Academic Journey
+            </h2>
+          </div>
           <div className="w-24 md:w-32 h-1 md:h-1.5 bg-slate-900 dark:bg-slate-300 mx-auto mb-4 md:mb-6 rounded-full"></div>
           <p className="text-slate-700 dark:text-slate-100 text-base md:text-lg max-w-2xl mx-auto px-4">
             Academic achievements and continuous learning

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Calendar, MapPin } from "lucide-react";
+import { Calendar, MapPin, Briefcase } from "lucide-react";
 
 const Experience = () => {
   const experiences = [
@@ -46,20 +46,47 @@ const Experience = () => {
           transition={{ duration: 0.5 }}
           className="text-center mb-8 md:mb-12 lg:mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-4 md:mb-6 gradient-text px-4">
-            Professional Experience
-          </h2>
+          <div className="flex items-center justify-center gap-3 mb-4 md:mb-6">
+            <span className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
+              <Briefcase className="w-6 h-6 md:w-8 md:h-8" />
+            </span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold gradient-text">
+              Professional Experience
+            </h2>
+          </div>
           <div className="w-24 md:w-32 h-1 md:h-1.5 bg-slate-900 dark:bg-slate-300 mx-auto mb-4 md:mb-6 rounded-full"></div>
         </motion.div>
 
-        <div className="space-y-6 md:space-y-8">
+        <motion.div
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: {
+                staggerChildren: 0.2,
+              },
+            },
+          }}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          className="space-y-6 md:space-y-8"
+        >
           {experiences.map((exp, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              variants={{
+                hidden: { opacity: 0, y: 30 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: {
+                    type: "spring",
+                    stiffness: 50,
+                    damping: 20,
+                  },
+                },
+              }}
               className="glass p-6 md:p-8 rounded-xl border border-slate-300 dark:border-dark-600/50 hover:border-slate-500 dark:hover:border-slate-600 card-hover shadow-lg"
             >
               <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4 md:mb-6">
@@ -100,7 +127,7 @@ const Experience = () => {
               </ul>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

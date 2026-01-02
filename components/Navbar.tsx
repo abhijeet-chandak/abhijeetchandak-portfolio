@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Menu, X, Download } from "lucide-react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { downloadResume, preloadResume } from "@/utils/downloadPdf";
 
@@ -10,6 +11,8 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  const [hoveredNav, setHoveredNav] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -64,87 +67,90 @@ const Navbar = () => {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         mounted && isScrolled
-          ? "bg-white/95 dark:bg-dark-900/95 backdrop-blur-xl shadow-2xl border-b border-slate-200 dark:border-dark-700/50"
-          : "bg-transparent"
+          ? "bg-white/80 dark:bg-dark-950/80 backdrop-blur-md shadow-lg border-b border-slate-200/50 dark:border-dark-700/50 py-2"
+          : "bg-transparent py-4"
       }`}
       suppressHydrationWarning
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 md:h-20">
+        <div className="flex items-center justify-between">
           <motion.a
             href="#home"
-            className="flex items-center truncate max-w-[200px] sm:max-w-none"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            className="flex items-center gap-3 group"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            aria-label="Abhijeet Chandak Portfolio Home"
           >
-            <span className="hidden sm:inline text-lg sm:text-xl md:text-2xl font-display font-bold gradient-text">
+            <div className="relative w-10 h-10 rounded-xl overflow-hidden shadow-lg shadow-cyan-500/20 group-hover:shadow-cyan-500/40 transition-all duration-300 bg-white p-0.5">
+              <Image
+                src="/logo.png"
+                alt="AC Logo"
+                width={40}
+                height={40}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <span className="text-lg font-display font-bold text-slate-800 dark:text-slate-100 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
               Abhijeet Chandak
-            </span>
-            <span className="sm:hidden w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-600 via-blue-600 to-cyan-700 dark:from-cyan-500 dark:via-blue-500 dark:to-cyan-600 flex items-center justify-center text-white font-display font-bold text-sm shadow-lg shadow-cyan-600/40 dark:shadow-cyan-500/50 border border-cyan-500/20 dark:border-cyan-400/30">
-              AC
             </span>
           </motion.a>
 
           {/* Desktop Menu */}
-          <nav
-            className="hidden md:flex items-center space-x-4 lg:space-x-6 xl:space-x-8"
-            aria-label="Main navigation"
-          >
-            {navItems.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                className="text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white font-medium transition-colors duration-200 relative group text-sm lg:text-base focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-dark-900 rounded px-1"
-                aria-label={`Navigate to ${item.name} section`}
+          <div className="hidden md:flex items-center gap-1">
+            <nav className="flex items-center gap-1 bg-white/50 dark:bg-dark-800/50 backdrop-blur-sm px-2 py-1.5 rounded-full border border-slate-200/50 dark:border-dark-700/50 shadow-sm">
+              {navItems.map((item) => (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  onMouseEnter={() => setHoveredNav(item.name)}
+                  onMouseLeave={() => setHoveredNav(null)}
+                  className="relative px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors duration-200 rounded-full z-10"
+                >
+                  {hoveredNav === item.name && (
+                    <motion.span
+                      layoutId="nav-pill"
+                      className="absolute inset-0 bg-slate-100 dark:bg-slate-700/50 rounded-full -z-10"
+                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    />
+                  )}
+                  {item.name}
+                </a>
+              ))}
+            </nav>
+
+            <div className="ml-4 pl-4 border-l border-slate-200 dark:border-dark-700 h-8 flex items-center">
+              <motion.button
+                onClick={async () => {
+                  setIsDownloading(true);
+                  try {
+                    await downloadResume("Abhijeet-Chandak-Resume.pdf");
+                  } finally {
+                    setTimeout(() => setIsDownloading(false), 500);
+                  }
+                }}
+                onMouseEnter={preloadResume}
+                disabled={isDownloading}
+                className="px-4 py-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-full font-semibold text-sm shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                aria-label="Download resume PDF"
               >
-                {item.name}
-                <span
-                  className="absolute bottom-0 left-0 w-0 h-0.5 bg-slate-900 dark:bg-slate-300 group-hover:w-full transition-all duration-300"
-                  aria-hidden="true"
-                ></span>
-              </a>
-            ))}
-            <motion.button
-              onClick={async () => {
-                setIsDownloading(true);
-                try {
-                  await downloadResume("Abhijeet-Chandak-Resume.pdf");
-                } finally {
-                  // Small delay for visual feedback
-                  setTimeout(() => setIsDownloading(false), 500);
-                }
-              }}
-              onMouseEnter={preloadResume}
-              disabled={isDownloading}
-              className="px-4 py-2 bg-slate-900 dark:bg-slate-700 dark:border-2 dark:border-slate-500/50 text-white rounded-lg font-semibold text-sm shadow-md dark:shadow-lg dark:shadow-slate-700/40 hover:shadow-lg hover:shadow-slate-900/30 dark:hover:shadow-xl dark:hover:shadow-slate-600/50 hover:bg-slate-800 dark:hover:bg-slate-600 dark:hover:border-slate-400/70 transition-all duration-300 flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-dark-900 disabled:opacity-70 disabled:cursor-not-allowed"
-              whileHover={!isDownloading ? { scale: 1.05 } : {}}
-              whileTap={!isDownloading ? { scale: 0.95 } : {}}
-              aria-label="Download resume PDF"
-              aria-busy={isDownloading}
-            >
-              <Download
-                className={`w-4 h-4 transition-transform ${isDownloading ? "animate-pulse" : ""}`}
-                aria-hidden="true"
-              />
-              <span className="hidden lg:inline">
-                {isDownloading ? "Downloading..." : "Resume"}
-              </span>
-            </motion.button>
-          </nav>
+                <Download
+                  className={`w-4 h-4 ${isDownloading ? "animate-pulse" : ""}`}
+                />
+                <span className="hidden lg:inline">
+                  {isDownloading ? "Loading..." : "Resume"}
+                </span>
+                <span className="lg:hidden">CV</span>
+              </motion.button>
+            </div>
+          </div>
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-dark-900 rounded p-1"
+            className="md:hidden p-2 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-dark-800 rounded-lg transition-colors"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-            aria-expanded={isMobileMenuOpen}
-            aria-controls="mobile-menu"
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
           >
-            {isMobileMenuOpen ? (
-              <X size={24} aria-hidden="true" />
-            ) : (
-              <Menu size={24} aria-hidden="true" />
-            )}
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </div>
@@ -153,51 +159,40 @@ const Navbar = () => {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            id="mobile-menu"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-white/95 dark:bg-dark-900/95 backdrop-blur-xl border-t border-slate-200 dark:border-dark-700/50"
-            role="menu"
-            aria-label="Mobile navigation menu"
+            className="md:hidden bg-white/95 dark:bg-dark-900/95 backdrop-blur-xl border-t border-slate-200 dark:border-dark-700/50 overflow-hidden"
           >
-            <nav className="px-4 pt-2 pb-4 space-y-2" aria-label="Mobile navigation">
+            <nav className="p-4 space-y-2">
               {navItems.map((item) => (
                 <a
                   key={item.name}
                   href={item.href}
-                  className="block py-2 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-dark-900 rounded px-2"
+                  className="block px-4 py-3 text-slate-600 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-950/30 rounded-xl font-medium transition-colors"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  role="menuitem"
-                  aria-label={`Navigate to ${item.name} section`}
                 >
                   {item.name}
                 </a>
               ))}
-              <motion.button
-                onClick={async () => {
-                  setIsDownloading(true);
-                  try {
-                    await downloadResume("Abhijeet-Chandak-Resume.pdf");
-                    setIsMobileMenuOpen(false);
-                  } finally {
-                    setTimeout(() => setIsDownloading(false), 500);
-                  }
-                }}
-                onMouseEnter={preloadResume}
-                disabled={isDownloading}
-                className="flex items-center gap-2 py-2 px-4 bg-slate-900 dark:bg-slate-700 dark:border-2 dark:border-slate-500/50 text-white rounded-lg font-semibold text-sm mt-2 shadow-md dark:shadow-lg dark:shadow-slate-700/40 hover:shadow-lg dark:hover:shadow-xl dark:hover:shadow-slate-600/50 hover:bg-slate-800 dark:hover:bg-slate-600 dark:hover:border-slate-400/70 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-dark-900 disabled:opacity-70 disabled:cursor-not-allowed"
-                whileTap={!isDownloading ? { scale: 0.95 } : {}}
-                role="menuitem"
-                aria-label="Download resume PDF"
-                aria-busy={isDownloading}
-              >
-                <Download
-                  className={`w-4 h-4 transition-transform ${isDownloading ? "animate-pulse" : ""}`}
-                  aria-hidden="true"
-                />
-                {isDownloading ? "Downloading..." : "Download Resume"}
-              </motion.button>
+              <div className="pt-4 mt-2 border-t border-slate-200 dark:border-dark-700">
+                <button
+                  onClick={async () => {
+                    setIsDownloading(true);
+                    try {
+                      await downloadResume("Abhijeet-Chandak-Resume.pdf");
+                      setIsMobileMenuOpen(false);
+                    } finally {
+                      setTimeout(() => setIsDownloading(false), 500);
+                    }
+                  }}
+                  disabled={isDownloading}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-xl font-semibold shadow-md active:scale-95 transition-all"
+                >
+                  <Download className={`w-4 h-4 ${isDownloading ? "animate-pulse" : ""}`} />
+                  {isDownloading ? "Downloading..." : "Download Resume"}
+                </button>
+              </div>
             </nav>
           </motion.div>
         )}

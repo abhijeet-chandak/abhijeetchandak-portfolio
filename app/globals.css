@@ -25,10 +25,11 @@ body {
   transition:
     background-color 0.3s ease,
     color 0.3s ease;
-  /* Performance optimizations */
+  /* Performance optimizations & Typography */
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  line-height: 1.6;
 }
 
 @layer utilities {

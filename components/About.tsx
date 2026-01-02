@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Code2, Rocket, Users, Github } from "lucide-react";
+import { Code2, Rocket, Users, Github, User } from "lucide-react";
 
 const About = () => {
   const features = [
@@ -35,9 +35,14 @@ const About = () => {
           transition={{ duration: 0.5 }}
           className="text-center mb-8 md:mb-12 lg:mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-4 md:mb-6 gradient-text px-4">
-            About Me
-          </h2>
+          <div className="flex items-center justify-center gap-3 mb-4 md:mb-6">
+            <span className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
+              <User className="w-6 h-6 md:w-8 md:h-8" />
+            </span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold gradient-text">
+              About Me
+            </h2>
+          </div>
           <div className="w-24 md:w-32 h-1 md:h-1.5 bg-slate-900 dark:bg-slate-300 mx-auto mb-6 md:mb-8 rounded-full"></div>
         </motion.div>
 

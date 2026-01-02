@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { ChevronDown, Download, Code2 } from "lucide-react";
+import { ChevronDown, Download, Code2, Send } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import CodeTyping from "./CodeTyping";
@@ -210,6 +210,7 @@ const Hero = () => {
           style={{
             transform: `translate(${mousePosition.x * 1.2}px, ${mousePosition.y * 1.2}px)`,
             transition: "transform 0.2s ease-out",
+            willChange: "transform",
           }}
           suppressHydrationWarning
         />
@@ -218,6 +219,7 @@ const Hero = () => {
           style={{
             transform: `translate(${mousePosition.x * -0.8}px, ${mousePosition.y * 0.8}px)`,
             transition: "transform 0.25s ease-out",
+            willChange: "transform",
           }}
           suppressHydrationWarning
         />
@@ -226,6 +228,7 @@ const Hero = () => {
           style={{
             transform: `translate(${mousePosition.x * 0.6}px, ${mousePosition.y * -0.6}px)`,
             transition: "transform 0.3s ease-out",
+            willChange: "transform",
           }}
           suppressHydrationWarning
         />
@@ -300,7 +303,8 @@ const Hero = () => {
                 whileTap={{ scale: 0.95 }}
                 aria-label="Get in touch with me"
               >
-                Get In Touch
+                <Send className="w-4 h-4 md:w-5 md:h-5" />
+                <span>Get In Touch</span>
               </motion.a>
               <motion.button
                 onClick={async () => {
