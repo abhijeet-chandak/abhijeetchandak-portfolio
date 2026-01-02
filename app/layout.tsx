@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import ToastProvider from "@/components/ToastProvider";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import SkipLink from "@/components/SkipLink";
+import LayoutWrapper from "@/components/LayoutWrapper";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -138,10 +136,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <ToastProvider>
-          <SkipLink />
-          <Navbar />
-          <main id="main-content">{children}</main>
-          <Footer />
+          <LayoutWrapper>{children}</LayoutWrapper>
         </ToastProvider>
         {/* eslint-disable react/no-danger */}
         <script
